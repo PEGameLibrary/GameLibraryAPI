@@ -17,6 +17,7 @@ public class Game {
     private LocalDate addedDate;
     private double purchasePrice;
     private AgeCategory ageCategory;
+    private double rentalPrice;
 
     public Game() {}
 
@@ -29,6 +30,7 @@ public class Game {
         this.addedDate = addedDate;
         this.purchasePrice = purchasePrice;
         this.ageCategory = ageCategory;
+        this.rentalPrice = calculateRentalPrice(price);
     }
 
    
@@ -57,5 +59,10 @@ public class Game {
 
     public double getPurchasePrice() { return purchasePrice; }
     public void setPurchasePrice(double purchasePrice) { this.purchasePrice = purchasePrice; }
+  private double calculateRentalPrice(double price) {
+        return price * 0.05;  // Pretul de închiriere este 5% din valoarea jocului
+    }
+
+    public double getRentalPrice() { return rentalPrice; }
 
 }

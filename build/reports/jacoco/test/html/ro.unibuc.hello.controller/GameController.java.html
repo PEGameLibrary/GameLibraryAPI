@@ -23,7 +23,7 @@ public class GameController {
 <span class="nc" id="L23">        return gameService.getAllGames();</span>
     }
 
-    @GetMapping(&quot;/{id}&quot;)
+    @GetMapping(&quot;/Find/{id}&quot;)
     public ResponseEntity&lt;Game&gt; getGameById(@PathVariable String id) {
 <span class="nc" id="L28">        Optional&lt;Game&gt; game = gameService.getGameById(id);</span>
 <span class="nc" id="L29">        return game.map(ResponseEntity::ok)</span>
@@ -35,7 +35,7 @@ public class GameController {
 <span class="nc" id="L35">        return gameService.addGame(game);</span>
     }
 
-    @DeleteMapping(&quot;/Find/{id}&quot;)
+    @DeleteMapping(&quot;Delete/{id}&quot;)
     public ResponseEntity&lt;Void&gt; deleteGame(@PathVariable String id) {
 <span class="nc" id="L40">        gameService.deleteGame(id);</span>
 <span class="nc" id="L41">        return ResponseEntity.noContent().build();</span>

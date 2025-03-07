@@ -24,12 +24,16 @@ public class UserService{
         return _userRepository.findById(id);
     }
 
-    public User addUser(User user){
-        return _userRepository.save(user);
-        
+  public User addUser(User user){
+    if (user.getBalance() == 0.0) {
+        user.setBalance(0.0);  
     }
+    return _userRepository.save(user);
+}
 
     public void deleteAllUsers() {
         _userRepository.deleteAll();
     }
+
+
 }

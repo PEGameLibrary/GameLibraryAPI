@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RentalService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">hello</a> &gt; <a href="index.source.html" class="el_package">ro.unibuc.hello.service</a> &gt; <span class="el_source">RentalService.java</span></div><h1>RentalService.java</h1><pre class="source lang-java linenums">package ro.unibuc.hello.service;
+
+import ro.unibuc.hello.data.model.Rental;
+import ro.unibuc.hello.data.repository.RentalRepository;
+import ro.unibuc.hello.data.repository.UserRepository;
+import ro.unibuc.hello.data.repository.GameRepository;
+import ro.unibuc.hello.data.model.Game;
+import ro.unibuc.hello.data.model.User;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class RentalService {
+
+    private final RentalRepository rentalRepository;
+    private final UserRepository userRepository;
+    private final GameRepository gameRepository;
+    private static final double DAILY_LATE_FEE = 2.5; // Penalizare zilnică
+
+<span class="nc" id="L24">    public RentalService(RentalRepository rentalRepository, UserRepository userRepository, GameRepository gameRepository) {</span>
+<span class="nc" id="L25">        this.rentalRepository = rentalRepository;</span>
+<span class="nc" id="L26">        this.userRepository = userRepository;</span>
+<span class="nc" id="L27">        this.gameRepository = gameRepository;</span>
+<span class="nc" id="L28">    }</span>
+
+    public Rental rentGame(String userId, String gameId, int rentalDays) {
+<span class="nc" id="L31">        Optional&lt;User&gt; userOpt = userRepository.findById(userId);</span>
+<span class="nc" id="L32">        Optional&lt;Game&gt; gameOpt = gameRepository.findById(gameId);</span>
+
+<span class="nc bnc" id="L34" title="All 4 branches missed.">        if (userOpt.isEmpty() || gameOpt.isEmpty()) {</span>
+<span class="nc" id="L35">            throw new RuntimeException(&quot;Utilizatorul sau jocul nu există!&quot;);</span>
+        }
+
+<span class="nc" id="L38">        User user = userOpt.get();</span>
+<span class="nc" id="L39">        Game game = gameOpt.get();</span>
+
+        // Verificăm dacă user are închirieri întârziate
+<span class="nc" id="L42">        List&lt;Rental&gt; overdueRentals = rentalRepository.findByUserId(userId)</span>
+<span class="nc" id="L43">                .stream().filter(Rental::isOverdue).toList();</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">        if (!overdueRentals.isEmpty()) {</span>
+<span class="nc" id="L45">            throw new RuntimeException(&quot;Nu poți închiria până nu returnezi jocurile restante!&quot;);</span>
+        }
+
+        // Verificăm balanța utilizatorului
+<span class="nc bnc" id="L49" title="All 2 branches missed.">        if (user.getBalance() &lt; game.getPrice() * rentalDays) {</span>
+<span class="nc" id="L50">            throw new RuntimeException(&quot;Balanță insuficientă pentru a închiria acest joc!&quot;);</span>
+        }
+
+        // Scădem din balanță
+<span class="nc" id="L54">        user.deductBalance(game.getPrice() * rentalDays);</span>
+<span class="nc" id="L55">        userRepository.save(user);</span>
+
+        // Creăm închirierea
+<span class="nc" id="L58">        Rental rental = new Rental(userId, gameId, rentalDays);</span>
+<span class="nc" id="L59">        rental.setRentalDate(Instant.now());</span>
+<span class="nc" id="L60">        rental.setReturnDate(Instant.now().plusSeconds((long) rentalDays * 86400)); // Calculăm return date</span>
+<span class="nc" id="L61">        System.out.println(&quot;DEBUG: rentalDate=&quot; + rental.getRentalDate() + &quot; returnDate=&quot; + rental.getReturnDate());</span>
+
+<span class="nc" id="L63">        return rentalRepository.save(rental);</span>
+    }
+
+    public Optional&lt;Rental&gt; returnGame(String rentalId) {
+<span class="nc" id="L67">        Optional&lt;Rental&gt; rentalOpt = rentalRepository.findById(rentalId);</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">        if (rentalOpt.isEmpty()) {</span>
+<span class="nc" id="L69">            return Optional.empty();</span>
+        }
+
+<span class="nc" id="L72">        Rental rental = rentalOpt.get();</span>
+<span class="nc" id="L73">        Optional&lt;User&gt; userOpt = userRepository.findById(rental.getUserId());</span>
+
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        if (userOpt.isEmpty()) {</span>
+<span class="nc" id="L76">            throw new RuntimeException(&quot;Utilizatorul nu există!&quot;);</span>
+        }
+
+<span class="nc" id="L79">        User user = userOpt.get();</span>
+
+        // Aplicăm penalizare dacă există întârzieri
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        if (rental.isOverdue()) {</span>
+<span class="nc" id="L83">            double totalLateFee = rental.getPenaltyFee();</span>
+<span class="nc" id="L84">            user.deductBalance(totalLateFee);</span>
+<span class="nc" id="L85">            userRepository.save(user);</span>
+        }
+
+<span class="nc" id="L88">        rentalRepository.delete(rental);</span>
+<span class="nc" id="L89">        return Optional.of(rental);</span>
+    }
+
+    // Programare automată pentru aplicarea penalizărilor zilnic la ora 00:00
+    @Scheduled(cron = &quot;0 0 0 * * ?&quot;)
+    public void applyLateFees() {
+<span class="nc" id="L95">        List&lt;Rental&gt; rentals = rentalRepository.findAll();</span>
+<span class="nc" id="L96">        rentals.forEach(rental -&gt; {</span>
+<span class="nc" id="L97">            rental.applyLateFee(DAILY_LATE_FEE);</span>
+<span class="nc" id="L98">            rentalRepository.save(rental);</span>
+<span class="nc" id="L99">        });</span>
+<span class="nc" id="L100">    }</span>
+
+    // Trimite notificări utilizatorilor cu 2 zile înainte de expirare
+    @Scheduled(cron = &quot;0 0 12 * * ?&quot;) // Se execută zilnic la ora 12:00
+    public void sendRentalReminders() {
+<span class="nc" id="L105">        List&lt;Rental&gt; rentals = rentalRepository.findAll();</span>
+<span class="nc" id="L106">        rentals.forEach(rental -&gt; {</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">            if (rental.getReturnDate().minusSeconds(2 * 86400L).isBefore(Instant.now())) {</span>
+<span class="nc" id="L108">                System.out.println(&quot;Reminder: Jocul &quot; + rental.getGameId() + &quot; trebuie returnat în 2 zile!&quot;);</span>
+            }
+<span class="nc" id="L110">        });</span>
+<span class="nc" id="L111">    }</span>
+
+    public List&lt;Rental&gt; getAllRentals() {
+<span class="nc" id="L114">        return rentalRepository.findAll();</span>
+    }
+
+    public void deleteAllRentals() {
+<span class="nc" id="L118">        rentalRepository.deleteAll();</span>
+<span class="nc" id="L119">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

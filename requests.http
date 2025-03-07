@@ -1,102 +1,229 @@
-
-# You can use this file to easily send requests to your API.
-# Prerequisite: humao.rest-client Vscode plugin (already present on codespace)
-# High-level overview of REST API concepts used here: https://www.packtpub.com/en-us/learning/how-to-tutorials/what-are-rest-verbs-and-status-codes-tutorial?srsltid=AfmBOoppDqtkhRxj5BLZONRZFzRDmh6eP-xyTo6H4OuEHYuVbrg1d4Dm
+### 🔄 Ștergere toate datele pentru un test curat
+DELETE http://localhost:8080/Users/DeleteAll
 
 
-# Requests for API endpoints of the sample project:
+###
+DELETE http://localhost:8080/games/DeleteAll
 
-### Hello world endpoint: get response "Hello, Stranger!"
-GET http://localhost:8080/hello-world
+###
+DELETE http://localhost:8080/rentals/DeleteAll
 
-### Hello world with a request param passed.
-# When sending the request it will ask you for the name
-# hitting enter will avoid passing the param, and do the default behaviour above
-# @prompt name The name to display in response
-GET http://localhost:8080/hello-world
-    ?name={{name}}
-
-### Save a greeting to database
-@postGreetingId = 1001
-@postGreetingContent = Hello!
-POST http://localhost:8080/greetings
-Content-Type: application/json
-
-{
-    "id": "{{postGreetingId}}",
-    "content": "{{postGreetingContent}}"
-}
-
-### Get all greetings
-GET http://localhost:8080/greetings
-
-### Get info for greeting with given content
-# @prompt content Greeting content to look for, defaults to "Overview"
-GET http://localhost:8080/info
-    ?title={{content}}
-
-### Update an existing greeting
-@putGreetingId = 1001
-@putGreetingContent = Hello again!
-PUT http://localhost:8080/greetings/{{putGreetingId}}
-Content-Type: application/json
-
-{
-    "content": "{{putGreetingContent}}"
-}
-
-### Delete greeting
-@deleteGreetingId = 1001
-DELETE http://localhost:8080/greetings/{{deleteGreetingId}}
-
-
-# TODO add requests for your own endpoints!
-
-####Users
-
-###GetAll
-GET http://localhost:8080/Users/GetAll
-
-###AddUser
+### 🟢 1. Creare utilizatori (cu diferite balanțe)
 POST http://localhost:8080/Users/Add
 Content-Type: application/json
 
 {
     "fName": "John",
     "lName": "Doe",
-    "userName": "johndoe",
-    "password": "securepassword123",
-    "birthDate": "1990-01-01",
-    "email": "johndoe@example.com",
-    "phoneNumber": "1234567890"
+    "userName": "player1",
+    "password": "password123",
+    "birthDate": "2000-05-15",
+    "email": "player1@example.com",
+    "phoneNumber": "1234567890",
+    "balance": 100.0
 }
 
-### Get By ID
-GET http://localhost:8080/Users/Find/67c9ab605040be58cff44db0
+###
 
-###deleteAll
-DELETE http://localhost:8080/Users/DeleteAll
+POST http://localhost:8080/Users/Add
+Content-Type: application/json
 
-### Get all games
-GET http://localhost:8080/games/GetAll
+{
+    "fName": "Jane",
+    "lName": "Smith",
+    "userName": "player2",
+    "password": "securepass",
+    "birthDate": "1998-08-21",
+    "email": "player2@example.com",
+    "phoneNumber": "9876543210",
+    "balance": 999999.0
+}
 
-### Add a new game
+###
+
+POST http://localhost:8080/Users/Add
+Content-Type: application/json
+
+{
+    "fName": "Alice",
+    "lName": "Brown",
+    "userName": "player3",
+    "password": "strongpass",
+    "birthDate": "1995-11-10",
+    "email": "player3@example.com",
+    "phoneNumber": "5678901234",
+    "balance": 50.0
+}
+
+### 🟢 2. Verificare utilizatori creați
+GET http://localhost:8080/Users/GetAll
+
+---
+
+### 🟢 3. Creare jocuri (cu preț automat de închiriere)
 POST http://localhost:8080/games/Add
 Content-Type: application/json
 
 {
-    "title": "Cyberpunk 2078",
+    "title": "Cyberpunk 2077",
     "genre": "RPG",
-    "price": 19.99,
-    "totalCopies": 50,
+    "price": 50.0,
+    "totalCopies": 10,
     "maxPlayers": 1,
     "addedDate": "2024-03-04",
     "purchasePrice": 59.99,
     "ageCategory": "MATURE"
 }
 
-### Get By ID
-GET http://localhost:8080/games/Find/67c9a12035e72b2ba5c0694a
+###
 
-### Delete All
-DELETE http://localhost:8080/games/DeleteAll
+POST http://localhost:8080/games/Add
+Content-Type: application/json
+
+{
+    "title": "Minecraft",
+    "genre": "Sandbox",
+    "price": 20.0,
+    "totalCopies": 5,
+    "maxPlayers": 4,
+    "addedDate": "2024-03-04",
+    "purchasePrice": 29.99,
+    "ageCategory": "EVERYONE"
+}
+
+###
+
+POST http://localhost:8080/games/Add
+Content-Type: application/json
+
+{
+    "title": "The Witcher 3",
+    "genre": "Action RPG",
+    "price": 40.0,
+    "totalCopies": 7,
+    "maxPlayers": 1,
+    "addedDate": "2024-03-04",
+    "purchasePrice": 49.99,
+    "ageCategory": "MATURE"
+}
+
+### 🟢 4. Verificare jocuri create
+GET http://localhost:8080/games/GetAll
+
+
+
+### 🟢 2. Adăugare închirieri (inclusiv unele deja întârziate)
+
+### 🟢 Închiriere nouă (fără probleme)
+POST http://localhost:8080/rentals
+Content-Type: application/json
+
+{
+    "userId": "67cadb77c7844e1a7c34821d",
+    "gameId": "67cadb80c7844e1a7c348220",
+    "rentalDays": 2
+}
+
+### 🟢 Închiriere nouă pentru utilizator bogat
+POST http://localhost:8080/rentals
+Content-Type: application/json
+
+{
+    "userId": "67cadb79c7844e1a7c34821e",
+    "gameId": "67cadb82c7844e1a7c348221",
+    "rentalDays": 5
+}
+
+### 🟢 Închiriere cu termen de returnare expirat (simulat manual)
+POST http://localhost:8080/rentals
+Content-Type: application/json
+
+{
+    "userId": "67cadb7ac7844e1a7c34821f",
+    "gameId": "67cadb84c7844e1a7c348222",
+    "rentalDays": -3
+}
+
+---
+
+### 🟢 3. Verificare balanță utilizatori după închiriere
+GET http://localhost:8080/Users/Find/67cadb77c7844e1a7c34821d
+
+###
+
+GET http://localhost:8080/Users/Find/67cadb79c7844e1a7c34821e
+###
+
+GET http://localhost:8080/Users/Find/67cadb7ac7844e1a7c34821f
+
+---
+
+### 🟢 4. Încercare închiriere cu balanță insuficientă (ar trebui să dea eroare)
+POST http://localhost:8080/rentals
+Content-Type: application/json
+
+{
+    "userId": "67cadb77c7844e1a7c34821d",
+    "gameId": "67cadb84c7844e1a7c348222",
+    "rentalDays": 10
+}
+
+---
+
+### 🟢 5. Încercare închiriere cu datorii restante (ar trebui să dea eroare)
+POST http://localhost:8080/rentals
+Content-Type: application/json
+
+{
+    "userId": "67cadb7ac7844e1a7c34821f",
+    "gameId": "67cadb84c7844e1a7c348222",
+    "rentalDays": 5
+}
+
+---
+
+### 🟢 6. Aplicare automată penalizări pentru utilizatori întârziați
+GET http://localhost:8080/rentals/applyLateFees
+
+---
+
+### 🟢 7. Verificare balanță după penalizări
+GET http://localhost:8080/Users/Find/67cadb7ac7844e1a7c34821f
+
+---
+
+### 🟢 8. Returnarea unui joc fără întârziere
+DELETE http://localhost:8080/rentals/67cadb7ac7844e1a7c34821f
+
+---
+
+### 🟢 9. Returnarea unui joc întârziat (cu penalizare)
+DELETE http://localhost:8080/rentals/67cadb7ac7844e1a7c34821f
+
+---
+
+### 🟢 10. Verificare balanță utilizatori după penalizare
+GET http://localhost:8080/Users/Find/67cadb77c7844e1a7c34821d
+
+###
+GET http://localhost:8080/Users/Find/67cadb7ac7844e1a7c34821f
+
+---
+
+### 🟢 11. Verificare închirieri active
+GET http://localhost:8080/rentals/all
+
+###
+DELETE http://localhost:8080/rentals/DeleteAll
+
+---
+
+### 🟢 12. Încercare închiriere după ce utilizatorul și-a plătit datoriile
+POST http://localhost:8080/rentals
+Content-Type: application/json
+
+{
+    "userId": "67cadb7ac7844e1a7c34821f",
+    "gameId": "67cadb84c7844e1a7c348222",
+    "rentalDays": 5
+}

@@ -20,82 +20,112 @@ public class User {
     private String email;
     private String phoneNumber;
     private LocalDate registrationDate; 
+    private double balance; 
+
+
+<span class="nc" id="L26">    public User() {</span>
+<span class="nc" id="L27">    this.registrationDate = LocalDate.now();</span>
+<span class="nc" id="L28">    this.balance = 0.0;</span>
+<span class="nc" id="L29">}</span>
+
 
     public User(String fName, String lName, String userName, String password,
-<span class="nc" id="L25">                LocalDate birthDate, String email, String phoneNumber) {</span>
-<span class="nc" id="L26">        this.fName = fName;</span>
-<span class="nc" id="L27">        this.lName = lName;</span>
-<span class="nc" id="L28">        this.userName = userName;</span>
-<span class="nc" id="L29">        this.password = password;</span>
-<span class="nc" id="L30">        this.birthDate = birthDate;</span>
-<span class="nc" id="L31">        this.email = email;</span>
-<span class="nc" id="L32">        this.phoneNumber = phoneNumber;</span>
-<span class="nc" id="L33">        this.registrationDate = LocalDate.now();</span>
-<span class="nc" id="L34">    }</span>
+<span class="nc" id="L33">                LocalDate birthDate, String email, String phoneNumber, double balance) {</span>
+<span class="nc" id="L34">        this.fName = fName;</span>
+<span class="nc" id="L35">        this.lName = lName;</span>
+<span class="nc" id="L36">        this.userName = userName;</span>
+<span class="nc" id="L37">        this.password = password;</span>
+<span class="nc" id="L38">        this.birthDate = birthDate;</span>
+<span class="nc" id="L39">        this.email = email;</span>
+<span class="nc" id="L40">        this.phoneNumber = phoneNumber;</span>
+<span class="nc" id="L41">        this.registrationDate = LocalDate.now();</span>
+<span class="nc" id="L42">        this.balance = balance;</span>
+
+<span class="nc" id="L44">    }</span>
 
 
     public String getId() {
-<span class="nc" id="L38">        return id;</span>
+<span class="nc" id="L48">        return id;</span>
     }
     public void setId(String id) {
-<span class="nc" id="L41">        this.id = id;</span>
-<span class="nc" id="L42">    }</span>
+<span class="nc" id="L51">        this.id = id;</span>
+<span class="nc" id="L52">    }</span>
 
     public String getfName() {
-<span class="nc" id="L45">        return fName;</span>
+<span class="nc" id="L55">        return fName;</span>
     }
     public void setfName(String fName) {
-<span class="nc" id="L48">        this.fName = fName;</span>
-<span class="nc" id="L49">    }</span>
+<span class="nc" id="L58">        this.fName = fName;</span>
+<span class="nc" id="L59">    }</span>
 
     public String getlName() {
-<span class="nc" id="L52">        return lName;</span>
+<span class="nc" id="L62">        return lName;</span>
     }
     public void setlName(String lName) {
-<span class="nc" id="L55">        this.lName = lName;</span>
-<span class="nc" id="L56">    }</span>
+<span class="nc" id="L65">        this.lName = lName;</span>
+<span class="nc" id="L66">    }</span>
 
     public String getUserName() {
-<span class="nc" id="L59">        return userName;</span>
+<span class="nc" id="L69">        return userName;</span>
     }
     public void setUserName(String userName) {
-<span class="nc" id="L62">        this.userName = userName;</span>
-<span class="nc" id="L63">    }</span>
+<span class="nc" id="L72">        this.userName = userName;</span>
+<span class="nc" id="L73">    }</span>
 
     public String getPassword() {
-<span class="nc" id="L66">        return password;</span>
+<span class="nc" id="L76">        return password;</span>
     }
     public void setPassword(String password) {
-<span class="nc" id="L69">        this.password = password;</span>
-<span class="nc" id="L70">    }</span>
+<span class="nc" id="L79">        this.password = password;</span>
+<span class="nc" id="L80">    }</span>
 
     public LocalDate getBirthDate() {
-<span class="nc" id="L73">        return birthDate;</span>
+<span class="nc" id="L83">        return birthDate;</span>
     }
     public void setBirthDate(LocalDate birthDate) {
-<span class="nc" id="L76">        this.birthDate = birthDate;</span>
-<span class="nc" id="L77">    }</span>
+<span class="nc" id="L86">        this.birthDate = birthDate;</span>
+<span class="nc" id="L87">    }</span>
 
     public String getEmail() {
-<span class="nc" id="L80">        return email;</span>
+<span class="nc" id="L90">        return email;</span>
     }
     public void setEmail(String email) {
-<span class="nc" id="L83">        this.email = email;</span>
-<span class="nc" id="L84">    }</span>
+<span class="nc" id="L93">        this.email = email;</span>
+<span class="nc" id="L94">    }</span>
 
     public String getPhoneNumber() {
-<span class="nc" id="L87">        return phoneNumber;</span>
+<span class="nc" id="L97">        return phoneNumber;</span>
     }
     public void setPhoneNumber(String phoneNumber) {
-<span class="nc" id="L90">        this.phoneNumber = phoneNumber;</span>
-<span class="nc" id="L91">    }</span>
+<span class="nc" id="L100">        this.phoneNumber = phoneNumber;</span>
+<span class="nc" id="L101">    }</span>
 
     public LocalDate getRegistrationDate() {
-<span class="nc" id="L94">        return registrationDate;</span>
+<span class="nc" id="L104">        return registrationDate;</span>
     }
     public void setRegistrationDate(LocalDate registrationDate) {
-<span class="nc" id="L97">        this.registrationDate = registrationDate;</span>
-<span class="nc" id="L98">    }</span>
+<span class="nc" id="L107">        this.registrationDate = registrationDate;</span>
+<span class="nc" id="L108">    }</span>
+
+     public boolean hasEnoughBalance(double amount) {
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        return balance &gt;= amount;</span>
+    }
+
+    public void deductBalance(double amount) {
+<span class="nc bnc" id="L115" title="All 4 branches missed.">        if (amount &gt; 0 &amp;&amp; balance &gt;= amount) {</span>
+<span class="nc" id="L116">            balance -= amount;</span>
+        }
+<span class="nc" id="L118">    }</span>
+
+    public void addBalance(double amount) {
+<span class="nc bnc" id="L121" title="All 2 branches missed.">        if (amount &gt; 0) {</span>
+<span class="nc" id="L122">            balance += amount;</span>
+        }
+<span class="nc" id="L124">    }</span>
+
+    
+<span class="nc" id="L127">    public double getBalance() { return balance; }</span>
+<span class="nc" id="L128">    public void setBalance(double balance) { this.balance = balance; }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Rental.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">hello</a> &gt; <a href="index.source.html" class="el_package">ro.unibuc.hello.data.model</a> &gt; <span class="el_source">Rental.java</span></div><h1>Rental.java</h1><pre class="source lang-java linenums">package ro.unibuc.hello.data.model;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+
+@Document(collection = &quot;rentals&quot;)
+public class Rental {
+
+    @Id
+    private String id;
+    private String userId;  // ID-ul utilizatorului care a închiriat jocul
+    private String gameId;  // ID-ul jocului închiriat
+
+   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = &quot;yyyy-MM-dd&quot;, timezone = &quot;UTC&quot;)
+    private Instant rentalDate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = &quot;yyyy-MM-dd&quot;, timezone = &quot;UTC&quot;)
+    private Instant returnDate;
+
+    private double penaltyFee; // Penalizare acumulată
+
+    private int rentalDays;
+
+<span class="nc" id="L30">    public Rental() {</span>
+<span class="nc" id="L31">        this.rentalDate = Instant.now();</span>
+<span class="nc" id="L32">    }</span>
+
+<span class="nc" id="L34">    public Rental(String userId, String gameId, int rentalDays) {</span>
+<span class="nc" id="L35">        this.userId = userId;</span>
+<span class="nc" id="L36">        this.gameId = gameId;</span>
+<span class="nc" id="L37">        this.rentalDays = rentalDays;</span>
+<span class="nc" id="L38">        this.rentalDate = Instant.now();</span>
+<span class="nc" id="L39">        this.returnDate = rentalDate.plusSeconds(rentalDays * 86400L);</span>
+<span class="nc" id="L40">        this.penaltyFee = 0.0;</span>
+<span class="nc" id="L41">    }</span>
+
+    
+ public boolean isOverdue() {
+<span class="nc" id="L45">        return Instant.now().isAfter(returnDate);</span>
+    }
+
+    public void applyLateFee(double dailyFee) {
+<span class="nc bnc" id="L49" title="All 2 branches missed.">        if (isOverdue()) {</span>
+<span class="nc" id="L50">            this.penaltyFee += dailyFee;</span>
+        }
+<span class="nc" id="L52">    }</span>
+
+    // Convertește Instant în LocalDate doar pentru afisaj (dacă e necesar)
+    public LocalDate getRentalDateAsLocalDate() {
+<span class="nc" id="L56">        return LocalDate.ofInstant(rentalDate, ZoneId.systemDefault());</span>
+    }
+
+    public LocalDate getReturnDateAsLocalDate() {
+<span class="nc" id="L60">        return LocalDate.ofInstant(returnDate, ZoneId.systemDefault());</span>
+    }
+
+    // Getters și Setters
+<span class="nc" id="L64">    public double getPenaltyFee() { return penaltyFee; }</span>
+<span class="nc" id="L65">    public void setPenaltyFee(double penaltyFee) { this.penaltyFee = penaltyFee; }</span>
+
+<span class="nc" id="L67">    public String getUserId() { return userId; }</span>
+<span class="nc" id="L68">    public String getGameId() { return gameId; }</span>
+
+<span class="nc" id="L70">    public Instant getRentalDate() { return rentalDate; }</span>
+<span class="nc" id="L71">    public void setRentalDate(Instant rentalDate) { this.rentalDate = rentalDate; }</span>
+
+<span class="nc" id="L73">    public Instant getReturnDate() { return returnDate; }</span>
+<span class="nc" id="L74">    public void setReturnDate(Instant returnDate) { this.returnDate = returnDate; }</span>
+
+<span class="nc" id="L76">    public int getRentalDays() { return rentalDays; }</span>
+<span class="nc" id="L77">    public void setRentalDays(int rentalDays) { this.rentalDays = rentalDays; }</span>
+
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

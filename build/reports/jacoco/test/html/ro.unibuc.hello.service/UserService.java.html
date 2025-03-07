@@ -24,13 +24,17 @@ public class UserService{
 <span class="nc" id="L24">        return _userRepository.findById(id);</span>
     }
 
-    public User addUser(User user){
-<span class="nc" id="L28">        return _userRepository.save(user);</span>
-        
+  public User addUser(User user){
+<span class="nc bnc" id="L28" title="All 2 branches missed.">    if (user.getBalance() == 0.0) {</span>
+<span class="nc" id="L29">        user.setBalance(0.0);  </span>
     }
+<span class="nc" id="L31">    return _userRepository.save(user);</span>
+}
 
     public void deleteAllUsers() {
-<span class="nc" id="L33">        _userRepository.deleteAll();</span>
-<span class="nc" id="L34">    }</span>
+<span class="nc" id="L35">        _userRepository.deleteAll();</span>
+<span class="nc" id="L36">    }</span>
+
+
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

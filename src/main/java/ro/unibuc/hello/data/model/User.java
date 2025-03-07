@@ -20,9 +20,17 @@ public class User {
     private String email;
     private String phoneNumber;
     private LocalDate registrationDate; 
+    private double balance; 
+
+
+    public User() {
+    this.registrationDate = LocalDate.now();
+    this.balance = 0.0;
+}
+
 
     public User(String fName, String lName, String userName, String password,
-                LocalDate birthDate, String email, String phoneNumber) {
+                LocalDate birthDate, String email, String phoneNumber, double balance) {
         this.fName = fName;
         this.lName = lName;
         this.userName = userName;
@@ -31,6 +39,8 @@ public class User {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.registrationDate = LocalDate.now();
+        this.balance = balance;
+
     }
 
 
@@ -96,5 +106,25 @@ public class User {
     public void setRegistrationDate(LocalDate registrationDate) {
         this.registrationDate = registrationDate;
     }
+
+     public boolean hasEnoughBalance(double amount) {
+        return balance >= amount;
+    }
+
+    public void deductBalance(double amount) {
+        if (amount > 0 && balance >= amount) {
+            balance -= amount;
+        }
+    }
+
+    public void addBalance(double amount) {
+        if (amount > 0) {
+            balance += amount;
+        }
+    }
+
+    
+    public double getBalance() { return balance; }
+    public void setBalance(double balance) { this.balance = balance; }
 
 }

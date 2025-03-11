@@ -59,26 +59,41 @@ public class GameService {
         }
     
         Game game = optionalGame.get();
-        int noCopies = game.getAvailableCopies(); 
+        int availableCopies = game.getAvailableCopies(); 
         User user = optionalUser.get();
         double balance = user.getBalance();
-        if (noCopies >= 1) {
-            double price = game.getPrice();
-            price *= length;
+        boolean alreadyRented = _rentRepository.findAll().stream()
+                .anyMatch(r -> r.getUserID() == userID && r.getGameID() == gameID && LocalDate.now().isBefore(r.getEndDate()));
 
-            if(balance < price){
-                throw new RuntimeException("User dose not have enough money");
-            }
-
-            game.setAvailableCopies(game.getAvailableCopies() - 1);
-            _gameRepository.save(game);
-            user.addToBalance(-price);
-            _userRepository.save(user);
-            return _rentRepository.save(new Rent(userID, gameID, LocalDate.now(), length, price));
-            
+        if (alreadyRented) {
+            throw new RuntimeException("Utilizatorul a închiriat deja acest joc și încă nu l-a returnat.");
         }
-    
-        throw new RuntimeException("No available copies for game: " + gameID);
+
+        if (availableCopies < 1) {
+            throw new RuntimeException("Nu există copii disponibile pentru închiriere.");
+        }
+
+        double price = game.getPrice() * length;
+
+        if (balance < price) {
+            throw new RuntimeException("Eroare: Fonduri insuficiente! Ai nevoie de " + price + " RON, dar ai doar " + balance + " RON.");
+        }
+
+        int userAge = LocalDate.now().getYear() - user.getBirthDate().getYear();
+    int requiredAge = game.getAgeCategory().getRequiredAge();
+
+    if (userAge < requiredAge) {
+        throw new RuntimeException("Nu poți închiria acest joc! Vârsta minimă necesară este " + requiredAge + " ani.");
+    }
+
+        game.setAvailableCopies(availableCopies - 1);
+        _gameRepository.save(game);
+        
+        user.addToBalance(-price);
+        _userRepository.save(user);
+
+        Rent rent = new Rent(userID, gameID, LocalDate.now(), length, price);
+        return _rentRepository.save(rent);
     }
     
     public Rent extendRent(int gameID, int userID, LocalDate startDate, int length){

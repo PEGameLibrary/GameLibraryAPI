@@ -45,8 +45,20 @@ public class GameController {
     }
 
     @PatchMapping("/Rent/game={gameid}&user={userid}&for={length}")
-    public Rent rentGame(@PathVariable int gameid, @PathVariable int userid, @PathVariable int length){
-        return _gameService.rentGame(gameid, userid, length);
+    
+    public ResponseEntity<?> rentGame(@PathVariable("gameid") int gameid,
+                                  @PathVariable("userid") int userid,
+                                  @PathVariable("length") int length)
+                                  {
+                                    try {
+                                        Rent rent = _gameService.rentGame(gameid, userid, length);
+                                        return ResponseEntity.ok(rent);
+                                    } catch (RuntimeException e) {
+                                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+                                    }
+                                  
+       
+       
     }
 
     @PatchMapping("/Extend/game/{gameid}/user/{userid}/start/{startDate}/for/{length}")

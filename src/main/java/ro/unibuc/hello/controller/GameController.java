@@ -32,6 +32,7 @@ public class GameController {
         return _gameService.getAllGamesByGenre(genre);
     }
 
+   
     @GetMapping("/GetAll")
     public List<Game> getAllGames() {
         return _gameService.getAllGames();
@@ -40,42 +41,17 @@ public class GameController {
     @GetMapping("/Find/{id}")
     public ResponseEntity<Game> getGameById(@PathVariable int id) {
         Optional<Game> game = _gameService.getGameById(id);
-        return game.map(ResponseEntity::ok)
-                   .orElseGet(() -> ResponseEntity.notFound().build());
+        return game.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/Add")
-    public Game addGame(@RequestBody Game game) {
-        return _gameService.addGame(game);
+    public ResponseEntity<Game> addGame(@RequestBody Game game) {
+        Game createdGame = _gameService.addGame(game);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdGame); // Modificat la 201 CREATED
     }
-
-    @PatchMapping("/Rent/game={gameid}&user={userid}&for={length}")
-    public Rent rentGame(@PathVariable int gameid, @PathVariable int userid, @PathVariable int length){
-        return _gameService.rentGame(gameid, userid, length);
-    }
-
-    @PatchMapping("/Extend/game/{gameid}/user/{userid}/start/{startDate}/for/{length}")
-    public ResponseEntity<?> extendRent(@PathVariable int gameid, @PathVariable int userid, @PathVariable String startDate, @PathVariable int length ){
-        try {
-            LocalDate dateStartDate = LocalDate.parse(startDate);
-            Rent rent = _gameService.extendRent(gameid, userid, dateStartDate, length);
-            return ResponseEntity.ok(rent);
-        } catch (DateTimeParseException e) {
-            return ResponseEntity.badRequest().body("Invalid date format: " + startDate);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/DeleteAllRents")
-    public ResponseEntity<String> deleteAllRents(){
-        _gameService.deleteAllrents();
-        return ResponseEntity.ok("Toate inchirierile au fost ștersee");
-    }
-
 
     @DeleteMapping("/Delete/{id}")
-    public ResponseEntity<Void> deleteGame(@PathVariable  int id) {
+    public ResponseEntity<Void> deleteGame(@PathVariable int id) {
         _gameService.deleteGame(id);
         return ResponseEntity.noContent().build();
     }
@@ -83,8 +59,18 @@ public class GameController {
     @DeleteMapping("/DeleteAllGames")
     public ResponseEntity<String> deleteAllGames() {
         _gameService.deleteAllGames();
-        return ResponseEntity.ok("Toate jocurile au fost ștersee");
+        return ResponseEntity.ok("Toate jocurile au fost sterse");
     }
+
+  
+    
+
+
+    
+
+
+
+   
 
 
     @PostMapping("/AddReview")
@@ -106,9 +92,11 @@ public class GameController {
 
 
     @GetMapping("/{gameId}/reviews")
-    public ResponseEntity<List<Review>> getReviews(@PathVariable int gameId) {
-        return ResponseEntity.ok(_gameService.getReviewsForGame(gameId));
-    }
+public ResponseEntity<List<Review>> getReviews(@PathVariable int gameId) {
+    List<Review> reviews = _gameService.getReviewsForGame(gameId);
+    return ResponseEntity.ok(reviews != null ? reviews : List.of()); 
+}
+
 
 
 }

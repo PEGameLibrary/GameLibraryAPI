@@ -6,7 +6,6 @@ pipeline {
 
     environment {
         DOCKER_PASSWORD = credentials("Parola123@")
-        GITHUB_TOKEN = credentials("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")
         DOCKER_USERNAME = credentials("gamelibpe")
     }
 

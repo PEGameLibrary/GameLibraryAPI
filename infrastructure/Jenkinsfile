@@ -6,8 +6,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_PASSWORD = credentials('github_token3')
-        DOCKER_USERNAME = 'WilliamLazar2002' // Schimbă cu username-ul tău dacă e diferit
+        DOCKER_USERNAME = 'WilliamLazar2002'
     }
 
     stages {
@@ -27,23 +26,23 @@ pipeline {
                     def patch = sh(script: "echo ${gitTag} | cut -d . -f 3", returnStdout: true).trim()
 
                     def newMinor = minor.toInteger() + 1
-                    def newVersion = "${major}.${newMinor}.${patch}"
-
-                    env.IMAGE_VERSION = newVersion
+                    env.IMAGE_VERSION = "${major}.${newMinor}.${patch}"
                 }
 
-                sh """
-                docker build -t ${DOCKER_USERNAME}/hello-img:\${IMAGE_VERSION} -f Dockerfile .
-                """
+                sh '''
+                    docker build -t $DOCKER_USERNAME/hello-img:$IMAGE_VERSION -f Dockerfile .
+                '''
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                sh """
-                echo "\$DOCKER_PASSWORD" | docker login -u ${DOCKER_USERNAME} --password-stdin
-                docker push ${DOCKER_USERNAME}/hello-img:\${IMAGE_VERSION}
-                """
+                withCredentials([string(credentialsId: 'github_token3', variable: 'DOCKER_PASSWORD')]) {
+                    sh '''
+                        echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
+                        docker push $DOCKER_USERNAME/hello-img:$IMAGE_VERSION
+                    '''
+                }
             }
         }
     }

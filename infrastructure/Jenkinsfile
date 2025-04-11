@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_PASSWORD = 'Facultate2021@'
+        DOCKER_PASSWORD = ''credentials('github_token3')
         DOCKER_USERNAME = 'WilliamLazar2002' // Schimbă cu username-ul tău dacă e diferit
     }
 

@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_USERNAME = 'WilliamLazar2002'
+        DOCKER_USERNAME = 'williamlazar2002'
     }
 
     stages {

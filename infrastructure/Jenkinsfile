@@ -37,7 +37,7 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                withCredentials([string(credentialsId: 'github_token3', variable: 'DOCKER_PASSWORD')]) {
+                withCredentials([string(credentialsId: 'docker_password', variable: 'DOCKER_PASSWORD')]) {
                     sh '''
                         echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
                         docker push $DOCKER_USERNAME/hello-img:$IMAGE_VERSION

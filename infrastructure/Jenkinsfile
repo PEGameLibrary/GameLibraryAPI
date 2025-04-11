@@ -1,13 +1,63 @@
 pipeline {
     agent any
+
     environment {
-        DOCKER_PASSWORD = credentials("docker_password")
+        DOCKER_PASSWORD = credentials("docker_password") // credentialsId set in Jenkins
+    }
+
+    tools {
+        jdk 'jdk21'            // ID din Global Tool Config
+        gradle 'gradle-8'      // ID pentru Gradle (ex: gradle-8.13)
     }
 
     stages {
+
+        stage('Checkout') {
+            steps {
+                git branch: 'jenkins', url: 'https://github.com/PEGameLibrary/GameLibraryAPI'
+            }
+        }
+
         stage('Build & Test') {
             steps {
                 sh './gradlew clean build'
+            }
+        }
+
+        stage('Tag Image Version') {
+            steps {
+                script {
+                    // Preluăm versiunea curentă din ultimul tag
+                    GIT_TAG = sh(script: 'git fetch --tags && git tag | sort -V | tail -n 1', returnStdout: true).trim()
+                    echo "Current git tag: ${GIT_TAG}"
+
+                    // Extragem părțile
+                    MAJOR_VERSION = sh(script: "echo ${GIT_TAG} | cut -d . -f 1", returnStdout: true).trim()
+                    MINOR_VERSION = sh(script: "echo ${GIT_TAG} | cut -d . -f 2", returnStdout: true).trim()
+                    PATCH_VERSION = sh(script: "echo ${GIT_TAG} | cut -d . -f 3", returnStdout: true).trim()
+
+                    // Incrementăm versiunea
+                    NEW_MINOR_VERSION = (MINOR_VERSION.toInteger() + 1)
+                    IMAGE_VERSION = "${MAJOR_VERSION}.${NEW_MINOR_VERSION}.${PATCH_VERSION}"
+
+                    env.IMAGE_VERSION = IMAGE_VERSION
+                    echo "New Docker Image Version: ${IMAGE_VERSION}"
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t williamlazar2002/hello-img:${IMAGE_VERSION} ."
+            }
+        }
+
+        stage('Push to DockerHub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker_password', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh "docker push williamlazar2002/hello-img:${IMAGE_VERSION}"
+                }
             }
         }
     }

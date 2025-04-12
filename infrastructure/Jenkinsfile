@@ -8,7 +8,7 @@ pipeline {
     environment {
         DOCKER_USERNAME = 'williamlazar2002'
         DOCKER_PASSWORD = credentials('docker_password')
-        GITHUB_TOKEN = credentials('github_token')
+        GITHUB_TOKEN = credentials('github_token3')
     }
 
     stages {
@@ -24,10 +24,16 @@ pipeline {
                 script {
                     sh 'git fetch --tags'
 
-                    env.MAJOR_VERSION = sh(script: 'git tag | sort --version-sort | tail -1 | cut -d . -f 1', returnStdout: true).trim()
-                    env.MINOR_VERSION = sh(script: 'git tag | sort --version-sort | tail -1 | cut -d . -f 2', returnStdout: true).trim()
-                    env.PATCH_VERSION = sh(script: 'git tag | sort --version-sort | tail -1 | cut -d . -f 3', returnStdout: true).trim()
-                    env.IMAGE_TAG = "${env.MAJOR_VERSION}.$((env.MINOR_VERSION.toInteger() + 1)).${env.PATCH_VERSION}"
+                    def gitTag = sh(script: 'git tag | sort --version-sort | tail -1', returnStdout: true).trim()
+                    def parts = gitTag.tokenize('.')
+                    def major = parts[0]
+                    def minor = parts[1].toInteger() + 1
+                    def patch = parts[2]
+
+                    env.MAJOR_VERSION = major
+                    env.MINOR_VERSION = minor.toString()
+                    env.PATCH_VERSION = patch
+                    env.IMAGE_TAG = "${major}.${minor}.${patch}"
                 }
 
                 sh "docker build -t $DOCKER_USERNAME/hello-img:$IMAGE_TAG -f Dockerfile ."
@@ -42,6 +48,7 @@ pipeline {
                     sh '''
                         echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
                         docker push $DOCKER_USERNAME/hello-img:$IMAGE_TAG
+
                         git config user.email "ci@jenkins.local"
                         git config user.name "Jenkins CI"
                         git tag $IMAGE_TAG

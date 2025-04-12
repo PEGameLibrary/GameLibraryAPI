@@ -43,7 +43,7 @@ pipeline {
         stage('Push Docker Image & Git Tag') {
             steps {
                 withCredentials([
-                    string(credentialsId: 'github_token', variable: 'GITHUB_TOKEN')
+                    string(credentialsId: 'github_token3', variable: 'GITHUB_TOKEN')
                 ]) {
                     sh '''
                         echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin

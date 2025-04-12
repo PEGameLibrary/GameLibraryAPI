@@ -12,6 +12,19 @@ pipeline {
     }
 
     stages {
+        stage('Stop Running Containers') {
+    steps {
+        sh '''
+            echo "Stopping running hello and mongo containers if any..."
+
+            # Stop 'hello' container dacă există
+            docker ps -a --filter "name=hello" --format "{{.ID}}" | xargs -r docker rm -f
+
+            # Stop 'mongo' container dacă există
+            docker ps -a --filter "name=mongo" --format "{{.ID}}" | xargs -r docker rm -f
+        '''
+    }
+}
 
         stage('Build & Test') {
             steps {

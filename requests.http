@@ -38,6 +38,8 @@ GET http://localhost:8080/games/GetAll
 ### GET ALL GAMES BY GENRE
 GET http://localhost:8080/games/genre/RPG
 
+
+
 ### ADD NEW GAME
 POST http://localhost:8080/games/Add
 Content-Type: application/json

@@ -16,25 +16,34 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 
+import io.micrometer.core.instrument.MeterRegistry; 
+
 @RestController
 @RequestMapping("/games")
 public class GameController {
 
     private final GameService _gameService;
+    private final MeterRegistry meterRegistry;
 
 
-    public GameController(GameService gameService) {
+
+    public GameController(GameService gameService, MeterRegistry meterRegistry) {
         this._gameService = gameService;
+        this.meterRegistry = meterRegistry;
+
     }
 
     @GetMapping("/genre/{genre}")
     public List<Game> getAllGamesByGenre(@PathVariable String genre) {
+            meterRegistry.counter("games.by.genre.counter").increment(); // metrică 1
+
         return _gameService.getAllGamesByGenre(genre);
     }
 
    
     @GetMapping("/GetAll")
     public List<Game> getAllGames() {
+        meterRegistry.counter("games.getall.counter").increment(); // metrică 2
         return _gameService.getAllGames();
     }
 
@@ -46,6 +55,8 @@ public class GameController {
 
     @PostMapping("/Add")
     public ResponseEntity<Game> addGame(@RequestBody Game game) {
+            meterRegistry.counter("games.add.counter").increment(); // metrică 3
+
         Game createdGame = _gameService.addGame(game);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdGame); // Modificat la 201 CREATED
     }
@@ -58,6 +69,8 @@ public class GameController {
 
     @DeleteMapping("/DeleteAllGames")
     public ResponseEntity<String> deleteAllGames() {
+            meterRegistry.counter("games.delete.all.counter").increment(); // metrică 4
+
         _gameService.deleteAllGames();
         return ResponseEntity.ok("Toate jocurile au fost sterse");
     }
@@ -93,6 +106,8 @@ public class GameController {
 
     @GetMapping("/{gameId}/reviews")
 public ResponseEntity<List<Review>> getReviews(@PathVariable int gameId) {
+        meterRegistry.counter("games.reviews.counter").increment(); // metrică 5
+
     List<Review> reviews = _gameService.getReviewsForGame(gameId);
     return ResponseEntity.ok(reviews != null ? reviews : List.of()); 
 }
